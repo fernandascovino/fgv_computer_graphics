@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Trabalho 1 - Quantização de cores</title>
+	<script type="text/javascript" async
+		src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+	</script>
+</head>
+
+<body>
+
+	<h1>Trabalho A1 - Quantização de cores</h1>
+	Introdução à Computação Gráfica - prof. Asla Sá (FGV/EMAp)<br>
+	Aluna: Fernanda Scovino<br><br>
+
+	<b><a href="../notebooks/quantize_algorithms.ipynb">Código implementado para a produção das imagens</a></b><br><br>
+
+	<b>Referências:</b>
+
+	<ul>
+		<li><a href="http://www.ic.ufal.br/professor/thales/icg/Aula3.pdf">Imagem - Prof. Thales Vieira, Instituto de Matemática, UFA</a></li>
+		<li><a href="https://lmcaraig.com/color-quantization-using-k-means">Color quantization using K-Means - Lou Marvin Caraig (adaptação do código)</a></li>
+	</ul>
+
+	<h2>Representação de uma imagem</h2>
+	
+	<p>
+	Partindo da definição fotográfica de uma imagem, 
+	composta por um conjunto suporte e uma cor referente a cada ponto do conjunto, 
+	passamos a denotar matematicamente a essa relação como:<br>
+
+	$$f: U \subset \mathbb{R}^{2} \rightarrow C (\subset \mathbb{R}^{n})$$
+	
+	sendo:
+	<ul>
+		<li><i>U</i>: conjunto suporte (retângulo)</li>
+		<li><i>C</i>: espaço de cor</li>
+	</ul>
+	
+	O espaço de cor usualmente utilizado é monocromático (\(\mathbb{R}\)) ou tricromático (\(\mathbb{R}^{3}\)) - 
+	caso do sistema RGB. Assim, temos respectivamente \(f(x,y) = z\) ou, em \(\mathbb{R}^{3}\), 
+	\(f(x, y) = (f_{1}(x, y), f_2(x, y), f_{3}(x, y))\), uma componente para cada canal de cor.<br><br>
+	
+	Para obtermos a representação digital de uma imagem são considerados dois aspectos: 
+	a <b>representação espacial</b> e a <b>representação de cor</b>.
+	</p>
+	
+	<h3>Representação espacial</h3>
+
+	<p>
+	Nosso conjunto suporte é definido mais formalmente por \(U = \{(x,y) \in \mathbb{R}^{2} : a \leq x \leq b, c \leq y \leq d\}\),
+	 sendo \(a, b, c, d \in \mathbb{R}\). O problema que temos então é que nosso conjunto suporte está definido num espaço contínuo, 
+	 logo, para termos uma representação digital, precisamos discretizá-lo.<br><br>
+	
+	Um método comum para obtenção de unidades finitas do espaço (aqui chamadas de <i>células</i>) é a <b>amostragem matricial uniforme</b>:
+
+	Dado um suporte, criando uma malha dividindo os intervalos \([a, b]\) e \([c,d]\)
+	em m e n pedaços iguais respectivamente, ou seja:
+
+	$$\Delta x = \frac{b-a}{m}: x_{j} = a + j\Delta x\text{, }j = 0, 1, ..., m-1$$
+	$$\Delta y = \frac{d-c}{n}: y_{k} = c + k\Delta y\text{, }j = 0, 1, ..., n-1$$
+	
+	E assim definimos o <b>reticulado uniforme</b> associado ao suporte como: \(P_{\Delta} = \{(x_{k}, y{k}) \in \mathbb{R}^2\}\). 
+	A figura abaixo ilustra esse reticulado, na qual cada encontro de arestas é um ponto de \(P_{\Delta}\):
+
+	<figure>
+	<center><img src="../images/reticulado.png" alt="Reticulado uniforme" width="400" height="300" title="Adaptado de Vieira, 2014">
+		<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+	</figure>
+
+	Com isso, conseguimos construir as células da imagem, definindo-as como retângulos cujos pontos pertencem ao nosso reticulado: 
+	\( c_{jk} = [x_{j}, x_{j+1}] \times [y_{k}, y_{k+1}]\), que chamamos de <b>pixels</b> (<i>picture element</i>), como mostra a figura abaixo:
+
+	<figure>
+	<center><img src="../images/celula.png" alt="Pixel do conjunto suporte" width="400" height="300">
+		<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+	</figure>
+
+	Para representar digitalmente a imagem, precisamos então dos valores de \(f_{jk}\), referentes a cada célula \(c_{jk}\).
+	</p>
+
+	<h3>Representação de cor</h3>	
+
+	<p>
+	A função imagem atribui a cada pixel uma cor - note que chamamos de função pois não podem existir duas ou mais cores para um mesmo pixel. 
+	Pensando numa imagem física, se quebrássemos a mesma em unidades muito pequenas, como o espaço de cor é contínuo, 
+	ainda assim teríamos mais de uma cor numa mesma unidade. Por isso, é necessário que utilizemos de um método para 
+	<b>discretizar o espaço de cores</b>. Esse processo define a <b>resolução de cor de uma imagem</b>, 
+	isto é, quantos bits devemos utilizar para representar cor.
+
+	<figure>
+	<center><img src="../images/resolucao.png" alt="Resolução da cor cinza" width="600" height="300" title="Fonte: Vieira, 2014">
+		<figcaption><i>Fonte: Vieira, 2014</i></figcaption></center>
+	</figure>
+	</p>
+
+	<h3>Quantização de cor</h3>
+
+	<p>
+	O processo de discretização do espaço de cores (podendo esse ser originalmente finito ou infinito) é chamado de <b>quantização</b>, e pode ser feito de diversas maneiras. 
+	Neste trabalho iremos mostrar alguns dos métodos de quantização (e testar outros) - isto é, diferentes formas de selecionar um subconjunto do espaço de cores da imagem.<br><br>
+	
+	Para reduzirmos o número de cores, precisamos fazer algumas escolhas, como quais cores serão substituídas por outras. Para isso, 
+	iremos comparar duas ou mais cores utilizando a distância euclidiana - dadas duas cores \(c_{1} = (R_{1}, G_{1}, B_{1})$ e $c_{2} = (R_{2}, G_{2}, B_{2})\), o cálculo da distância euclidiana é dado por:
+
+	$$d(c_{1}, c_{2}) = \sqrt{(R_{1}−R_{2})^2 + (G_{1}− G_{2})^2+(B_{1} − B_{2})^2}$$
+
+	Nossa imagem original (mostrada abaixo) é representada como uma matriz de dimensões \((533, 800, 3)\) - isto é, \(800\times533\) pixels - e possui \(102.927\) cores RGB únicas.
+
+	<figure>
+			<center><img src="../images/washington.jpg" alt="original">
+				<figcaption><i>Fonte: Flickr - Washington por Crash Test Mike</i></figcaption></center>
+			</figure>
+	</p>
+
+	<h4>Quantização aleatória</h4>
+
+	<p>
+	Neste método, escolhemos aleatoriamente <i>n</i> cores da imagem para formar a nova paleta, e redefinimos as cores de cada pixel como a cor mais próxima à original na nova paleta.
+	A imagem transformada pode ser vista abaixo, para \(n=20\):
+
+	<figure>
+			<center><img src="../images/qtz_aleatoria.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com amostra aleatória</i></figcaption></center>
+			</figure>
+	</p>
+
+
+	<h4>Quantização pelas cores mais frequentes - Algoritmo de populosiodade</h4>
+
+	<p>
+	Aqui temos um teste de uma forma diferente de quantização: vamos utilizar as \(n\) cores mais frequentes da imagem. 
+	Como no exemplo acima, tomando \(n=20\), temos o resultado abaixo. 
+	Vamos que o método aleatório preserva melhor as cores da imagem nesse caso, e, além disso, o tempo de processamento do primeiro \((321ms)\) é menor que o segundo \((1.58s)\).
+
+	<figure>
+			<center><img src="../images/qtz_frequente.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com cores mais frequentes</i></figcaption></center>
+			</figure>
+	</p>
+
+	<h4>Quantização com limiar constante</h4>
+
+	<p>
+	Um método comum (no caso de figuras preto e branco) é definirmos um limIar constante, \(L_{0})\), 
+	no qual as cores serão atribuídas como 1 caso a intensidade seja maior que \(L_{0}\), e 0 caso contrário.
+
+	No caso do RGB, podemos selecionar, por exemplo, cores que tenham maior intensidade em cada um dos canais. 
+	O teste foi feito para os limites \((200,0,0)\) (vermelho), \((0,200,0)\) (verde) e \((0,0,200)\) (azul), resultando nas seguintes figuras:
+
+	<figure>
+			<center><img src="../images/qtz_vermelho.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com maior intensidade de verde (n = 155)</i></figcaption></center>
+			</figure>
+
+	<figure>
+			<center><img src="../images/qtz_verde.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com maior intensidade de verde (n = 760)</i></figcaption></center>
+			</figure>
+		
+	<figure>
+			<center><img src="../images/qtz_azul.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com maior intensidade de azul (n = 2458)</i></figcaption></center>
+			</figure>
+
+	Os tempos de processamento foram, respectivamente, \(10.1s\), \(4.27s\) e \(20s\), diretamente relacionado à quantidade de cores que é mantida em cada um dos casos.
+	</p>
+
+	<h4>Quantização com K-Means</h4>
+
+	<p>
+	Por fim, testamos aqui a quantização com o método K-Means, como proposto no <a href="https://lmcaraig.com/color-quantization-using-k-means">artigo</a>.
+	Esse algoritmo de clusterização comeá com \(n\) pontos aleatórios no espaço de cor, 
+	e divide o espaço em \(n\) grupos cujos centróides são um dos pontos escolhidos inicialmente e 
+	todos os pontos num mesmo grupo estão mais próximos de seu próprio centróide do que dos centróides dos demais grupos.
+
+	<figure>
+			<center><img src="../images/qtz_kmeans.jpg" alt="aleatoria">
+				<figcaption><i>Imagem quantizada com K-Means (n=20)</i></figcaption></center>
+			</figure>
+	</p>
+
+	<h3>Conclusão</h3>
+
+	No presente trabalho comparamos algums métodos de quantização de imagens. 
+	Dentre eles, vimos que os métodos que tiveram maior consistência com as cores originais foram o método aleatório e o K-Means, 
+	sendo o último melhor, pois manteve as cores da imagem mais homogêneas. Porém, computacionalmente o K-Means tem uma enorme 
+	defasagem em relação ao método aleatório: já com \(n=20\), o tempo de processamento do K-Means é quase <i>200x</i> o aleatório \((1m \times 60s \times 10^{3}ms / 321 ms)\) 
+	- <b>ou seja, podemos testar até 200 paletas aleatórias até chegar ao tempo de cálculo do K-Means</b>.<br><br>
+
+	Além desses, existem diversos outros métodos interessantes de quantização que também são utilizados nos processos de compressão de imagens, por exemplo, para compartilhamento. 
+	O mais interessante do presente trabalho foi notar que o algoritmo aleatório, mesmo para uma transformação para um espaço de cor pequeno, consegue preservar bastante da sua percepção original.
+</body>
+</html>
+
