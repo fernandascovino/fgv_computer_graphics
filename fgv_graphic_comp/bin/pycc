@@ -1,3 +1,0 @@
-#!/Users/fernandascovino/Documents/EMAp/Introdução à Computação Gráfica/trabalhos/fgv_graphic_comp/fgv_graphic_comp/fgv_graphic_comp/bin/python3
-from numba.pycc import main
-main()
