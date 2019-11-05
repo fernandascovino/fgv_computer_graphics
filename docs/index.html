@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="por">
+<title>Quantização de cores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<!-- Set font -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<style>.w3-lato {font-family: 'Lato', sans-serif;}</style>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+<script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
+<meta charset="utf-8"></meta>
+
+<body style="background-color:white;">
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-lato w3-theme w3-animate-left" id="mySidebar">
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="index.html">Início</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="Project/intro.html">Introdução: Representação da imagem</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="Project/quantize.html">Quantização de cores</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="Project/conclusion.html">Conclusões</a>
+
+        <div style="position: absolute; bottom: 5px; font-size: 80%; margin-left: 10px" class='w3-lato-light'>
+            <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+        </div>
+    </nav>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay">
+    </div>
+
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main w3-lato" style="margin-left:250px; margin-right: -300px;">
+
+        <div class="w3-row">
+            <h1 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>
+            Introdução à Computação Gráfica
+            </b></h1>
+
+            <p>
+            Projeto da disciplina <i>Introdução à Computação Gráfica - prof. Asla Sá (FGV/EMAp)</i> 
+            desenvolvido por <a href="http://github.com/fernandascovino">Fernanda Scovino</a>
+            </p>
+        </div>
+
+        <div class="w3-row">
+            <div class="w3-twothird">
+                <h3 class="w3-text-teal w3-lato">Apresentação</h3>
+                <p align="justify" style = "margin-right: -50px;">
+                O trabalho desenvolvido ao longo da disciplina busca explicar o conceito de quantização de cores, trabalhar discutir diferentes 
+                algoritmos para redução de tamanho da imagem através da redução de seu espaço de cor, uma das áreas de aplicação de algoritmos de quantização,
+                e discutir suas performances. O desenvolvimento está dividido em três partes:<br>
+                <ul>
+                    <b>1. Representação de imagens</b>: introdução da definição matemática de representação da imagem e seus componentes, e representação de cores <br>
+                    <b>2. Algoritmos de quantização</b>: exemplo prático com 4 diferentes algoritmos para quantização de imagem e a explicação dos mesmos; <br>
+                    <b>3. Conclusões</b>: comparação dos resultados dos algoritmos com o exemplo apresetado e conclusões do trabalho;<br><br>
+                </ul>
+                </p>
+
+            <h3 class="w3-text-teal w3-lato">Referências e código</h3>
+            <p align = "justify" style = "margin-right: 400px;"> 
+                <p>
+                    <b><a href="../../notebooks/quantize_algorithms.ipynb">Código implementado para a produção das imagens</a>
+                </p>
+
+                <p>
+                    Referências bibliográficas:</b>
+                    <ul>
+                        <li><a href="http://www.ic.ufal.br/professor/thales/icg/Aula3.pdf">Imagem - Prof. Thales Vieira, Instituto de Matemática, UFA</a></li>
+                        <li><a href="https://lmcaraig.com/color-quantization-using-k-means">Color quantization using K-Means - Lou Marvin Caraig (adaptação do código)</a></li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+
+        <!-- END MAIN -->
+      </div>
+
+      <script>
+        // Get the Sidebar
+        var mySidebar = document.getElementById("mySidebar");
+        // Get the DIV with overlay effect
+        var overlayBg = document.getElementById("myOverlay");
+        // Toggle between showing and hiding the sidebar, and add overlay effect
+        function w3_open() {
+          if (mySidebar.style.display === 'block') {
+            mySidebar.style.display = 'none';
+            overlayBg.style.display = "none";
+          } else {
+            mySidebar.style.display = 'block';
+            overlayBg.style.display = "block";
+          }
+        }
+        // Close the sidebar with the close button
+        function w3_close() {
+          mySidebar.style.display = "none";
+          overlayBg.style.display = "none";
+        }
+      </script>
+
+</body>
+
+</html>

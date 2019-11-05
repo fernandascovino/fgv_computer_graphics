@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="por">
+<title>Quantização de cores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<style>.w3-lato {font-family: 'Lato', sans-serif;}</style>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+<script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
+<meta charset="utf-8"></meta>
+
+<body style="background-color:white;">
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-lato w3-theme w3-animate-left" id="mySidebar">
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="../index.html">Início</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="intro.html">Introdução: Representação da imagem</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="quantize.html">Quantização de cores</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="conclusion.html">Conclusões</a>
+
+        <div style="position: absolute; bottom: 5px; font-size: 80%; margin-left: 10px" class='w3-lato-light'>
+            <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+        </div>
+    </nav>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay">
+    </div>
+
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main w3-lato" style="margin-left:250px;">
+
+        <div class="w3-row"></div>
+            <div class="w3-half w3-lato">
+                <h1 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Discussão dos modelos e conclusão</b></h1>
+            <p>
+            No presente trabalho comparamos alguns métodos de quantização de imagens. Dentre eles, vimos que os métodos que tiveram maior consistência com as cores originais foram o <b>método aleatório</b> e o <b>K-Means</b>, 
+            sendo que o último manteve as cores da imagem mais homogêneas. Porém, computacionalmente, o K-Means tem uma enorme 
+            defasagem em relação ao método aleatório: <i>já com \(n=20\), o tempo de processamento do K-Means é quase 200 x o aleatório \((1m \times 60s \times 10^{3}ms / 321 ms)\)</i> 
+            - ou seja, podemos testar até 200 paletas aleatórias até chegar ao tempo de cálculo do K-Means.<br><br>
+
+            Além desses, existem diversos outros métodos interessantes de quantização que também são utilizados nos processos de compressão de imagens, por exemplo, para compartilhamento. 
+            O mais interessante do presente trabalho foi notar que o algoritmo aleatório, mesmo para uma transformação para um espaço de cor pequeno, consegue preservar bastante da sua percepção original.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- END MAIN -->
+</div>
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
+
+</body>
+</html>

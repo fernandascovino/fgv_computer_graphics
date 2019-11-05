@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="por">
+<title>Quantização de cores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<style>.w3-lato {font-family: 'Lato', sans-serif;}</style>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+<script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
+<meta charset="utf-8"></meta>
+
+<body style="background-color:white;">
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-lato w3-theme w3-animate-left" id="mySidebar">
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="../index.html">Início</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="intro.html">Introdução: Representação da imagem</a>
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="quantize.html">Quantização de cores</a>
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="conclusion.html">Conclusões</a>
+
+        <div style="position: absolute; bottom: 5px; font-size: 80%; margin-left: 10px" class='w3-lato-light'>
+            <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+        </div>
+    </nav>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay">
+    </div>
+
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main w3-lato" style="margin-left:250px">
+
+        <div class="w3-row w3-lato">
+            <h1 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Representação de uma imagem</b></h1>
+			
+			<p>
+			Partindo da definição fotográfica de uma imagem, 
+			composta por um conjunto suporte e uma cor referente a cada ponto do conjunto, 
+			passamos a denotar matematicamente a essa relação como:<br>
+		
+			$$f: U \subset \mathbb{R}^{2} \rightarrow C (\subset \mathbb{R}^{n})$$
+			
+			sendo:
+			<ul>
+				<li><i>U</i>: conjunto suporte (retângulo)</li>
+				<li><i>C</i>: espaço de cor</li>
+			</ul>
+			
+			O espaço de cor usualmente utilizado é monocromático (\(\mathbb{R}\)) ou tricromático (\(\mathbb{R}^{3}\)) - 
+			caso do sistema RGB. Assim, temos respectivamente \(f(x,y) = z\) ou, em \(\mathbb{R}^{3}\), 
+			\(f(x, y) = (f_{1}(x, y), f_2(x, y), f_{3}(x, y))\), uma componente para cada canal de cor.<br><br>
+			
+			Para obtermos a representação digital de uma imagem são considerados dois aspectos: 
+			a <b>representação espacial</b> e a <b>representação de cor</b>.
+			</p>
+
+			<h2 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Representação espacial</b></h1>
+
+			<p>
+			Nosso conjunto suporte é definido mais formalmente por \(U = \{(x,y) \in \mathbb{R}^{2} : a \leq x \leq b, c \leq y \leq d\}\),
+			sendo \(a, b, c, d \in \mathbb{R}\). O problema que temos então é que nosso conjunto suporte está definido num espaço contínuo, 
+			logo, para termos uma representação digital, precisamos discretizá-lo.<br><br>
+			
+			Um método comum para obtenção de unidades finitas do espaço (aqui chamadas de <i>células</i>) é a <b>amostragem matricial uniforme</b>:
+
+			Dado um suporte, criando uma malha dividindo os intervalos \([a, b]\) e \([c,d]\)
+			em m e n pedaços iguais respectivamente, ou seja:
+
+			$$\Delta x = \frac{b-a}{m}: x_{j} = a + j\Delta x\text{, }j = 0, 1, ..., m-1$$
+			$$\Delta y = \frac{d-c}{n}: y_{k} = c + k\Delta y\text{, }j = 0, 1, ..., n-1$$
+			
+			E assim definimos o <b>reticulado uniforme</b> associado ao suporte como: \(P_{\Delta} = \{(x_{k}, y{k}) \in \mathbb{R}^2\}\). 
+			A figura abaixo ilustra esse reticulado, na qual cada encontro de arestas é um ponto de \(P_{\Delta}\):
+
+			<figure>
+			<center><img src="../images/reticulado.png" alt="Reticulado uniforme" width="400" height="300" title="Adaptado de Vieira, 2014">
+				<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+			</figure>
+
+			Com isso, conseguimos construir as células da imagem, definindo-as como retângulos cujos pontos pertencem ao nosso reticulado: 
+			\( c_{jk} = [x_{j}, x_{j+1}] \times [y_{k}, y_{k+1}]\), que chamamos de <b>pixels</b> (<i>picture element</i>), como mostra a figura abaixo:
+
+			<figure>
+			<center><img src="../images/celula.png" alt="Pixel do conjunto suporte" width="400" height="300">
+				<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+			</figure>
+
+			Para representar digitalmente a imagem, precisamos então dos valores de \(f_{jk}\), referentes a cada célula \(c_{jk}\).
+			</p>
+
+			<h2 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Representação de cor</b></h1>
+
+			<p>
+			A função imagem atribui a cada pixel uma cor - note que chamamos de função pois não podem existir duas ou mais cores para um mesmo pixel. 
+			Pensando numa imagem física, se quebrássemos a mesma em unidades muito pequenas, como o espaço de cor é contínuo, 
+			ainda assim teríamos mais de uma cor numa mesma unidade. Por isso, é necessário que utilizemos de um método para 
+			<b>discretizar o espaço de cores</b>. Esse processo define a <b>resolução de cor de uma imagem</b>, 
+			isto é, quantos bits devemos utilizar para representar cor.
+
+			<figure>
+			<center><img src="../images/resolucao.png" alt="Resolução da cor cinza" width="600" height="300" title="Fonte: Vieira, 2014">
+				<figcaption><i>Fonte: Vieira, 2014</i></figcaption></center>
+			</figure>
+			</p>
+        
+            </div>
+        </div>
+
+        <!-- END MAIN -->
+      </div>
+
+      <script>
+        // Get the Sidebar
+        var mySidebar = document.getElementById("mySidebar");
+        // Get the DIV with overlay effect
+        var overlayBg = document.getElementById("myOverlay");
+        // Toggle between showing and hiding the sidebar, and add overlay effect
+        function w3_open() {
+          if (mySidebar.style.display === 'block') {
+            mySidebar.style.display = 'none';
+            overlayBg.style.display = "none";
+          } else {
+            mySidebar.style.display = 'block';
+            overlayBg.style.display = "block";
+          }
+        }
+        // Close the sidebar with the close button
+        function w3_close() {
+          mySidebar.style.display = "none";
+          overlayBg.style.display = "none";
+        }
+      </script>
+
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+	<title> Trabalho 1 - Quantização de cores</title>
+	<!-- <script type="text/javascript" async
+		src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+	</script> -->
+    <!-- <meta charset="utf-8"></meta>
+</head>
+
+<body> --> -->
+
+	<!-- <h2>Representação de uma imagem</h2>
+	
+	<p>
+	Partindo da definição fotográfica de uma imagem, 
+	composta por um conjunto suporte e uma cor referente a cada ponto do conjunto, 
+	passamos a denotar matematicamente a essa relação como:<br>
+
+	$$f: U \subset \mathbb{R}^{2} \rightarrow C (\subset \mathbb{R}^{n})$$
+	
+	sendo:
+	<ul>
+		<li><i>U</i>: conjunto suporte (retângulo)</li>
+		<li><i>C</i>: espaço de cor</li>
+	</ul>
+	
+	O espaço de cor usualmente utilizado é monocromático (\(\mathbb{R}\)) ou tricromático (\(\mathbb{R}^{3}\)) - 
+	caso do sistema RGB. Assim, temos respectivamente \(f(x,y) = z\) ou, em \(\mathbb{R}^{3}\), 
+	\(f(x, y) = (f_{1}(x, y), f_2(x, y), f_{3}(x, y))\), uma componente para cada canal de cor.<br><br>
+	
+	Para obtermos a representação digital de uma imagem são considerados dois aspectos: 
+	a <b>representação espacial</b> e a <b>representação de cor</b>.
+	</p>
+	
+	<h3>Representação espacial</h3>
+
+	<p>
+	Nosso conjunto suporte é definido mais formalmente por \(U = \{(x,y) \in \mathbb{R}^{2} : a \leq x \leq b, c \leq y \leq d\}\),
+	 sendo \(a, b, c, d \in \mathbb{R}\). O problema que temos então é que nosso conjunto suporte está definido num espaço contínuo, 
+	 logo, para termos uma representação digital, precisamos discretizá-lo.<br><br>
+	
+	Um método comum para obtenção de unidades finitas do espaço (aqui chamadas de <i>células</i>) é a <b>amostragem matricial uniforme</b>:
+
+	Dado um suporte, criando uma malha dividindo os intervalos \([a, b]\) e \([c,d]\)
+	em m e n pedaços iguais respectivamente, ou seja:
+
+	$$\Delta x = \frac{b-a}{m}: x_{j} = a + j\Delta x\text{, }j = 0, 1, ..., m-1$$
+	$$\Delta y = \frac{d-c}{n}: y_{k} = c + k\Delta y\text{, }j = 0, 1, ..., n-1$$
+	
+	E assim definimos o <b>reticulado uniforme</b> associado ao suporte como: \(P_{\Delta} = \{(x_{k}, y{k}) \in \mathbb{R}^2\}\). 
+	A figura abaixo ilustra esse reticulado, na qual cada encontro de arestas é um ponto de \(P_{\Delta}\):
+
+	<figure>
+	<center><img src="images/reticulado.png" alt="Reticulado uniforme" width="400" height="300" title="Adaptado de Vieira, 2014">
+		<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+	</figure>
+
+	Com isso, conseguimos construir as células da imagem, definindo-as como retângulos cujos pontos pertencem ao nosso reticulado: 
+	\( c_{jk} = [x_{j}, x_{j+1}] \times [y_{k}, y_{k+1}]\), que chamamos de <b>pixels</b> (<i>picture element</i>), como mostra a figura abaixo:
+
+	<figure>
+	<center><img src="images/celula.png" alt="Pixel do conjunto suporte" width="400" height="300">
+		<figcaption><i>Adaptado de: Vieira, 2014</i></figcaption></center>
+	</figure>
+
+	Para representar digitalmente a imagem, precisamos então dos valores de \(f_{jk}\), referentes a cada célula \(c_{jk}\).
+	</p>
+
+	<h3>Representação de cor</h3>	
+
+	<p>
+	A função imagem atribui a cada pixel uma cor - note que chamamos de função pois não podem existir duas ou mais cores para um mesmo pixel. 
+	Pensando numa imagem física, se quebrássemos a mesma em unidades muito pequenas, como o espaço de cor é contínuo, 
+	ainda assim teríamos mais de uma cor numa mesma unidade. Por isso, é necessário que utilizemos de um método para 
+	<b>discretizar o espaço de cores</b>. Esse processo define a <b>resolução de cor de uma imagem</b>, 
+	isto é, quantos bits devemos utilizar para representar cor.
+
+	<figure>
+	<center><img src="images/resolucao.png" alt="Resolução da cor cinza" width="600" height="300" title="Fonte: Vieira, 2014">
+		<figcaption><i>Fonte: Vieira, 2014</i></figcaption></center>
+	</figure>
+	</p> -->
+

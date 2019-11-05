@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="por">
+<head>
+    <title>Quantização de cores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <style>.w3-lato {font-family: 'Lato', sans-serif;}</style>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+    <script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
+    <meta charset="utf-8"></meta>
+
+    <script> 
+        function original()
+            {var img = document.getElementById("image"); img.src="../images/washington.jpg";
+             var h1 = document.getElementById("titulo"); console.log(h1); 
+             h1.innerHTML="<b>Quantização de cor</b>";
+             var p = document.getElementById("descricao"); console.log(p);
+             p.innerHTML= "O processo de discretização do espaço de cores (podendo esse ser originalmente finito ou infinito) é chamado de <b>quantização</b>, \
+             e pode ser feito de diversas maneiras. Neste trabalho iremos mostrar alguns dos métodos de quantização (e testar outros) - isto é, diferentes formas \
+             de selecionar um subconjunto do espaço de cores da imagem.<br><br>" +
+            "Para reduzirmos o número de cores, precisamos fazer algumas escolhas, como quais cores serão substituídas por outras. Para isso, \
+            iremos comparar duas ou mais cores utilizando a distância euclidiana - dadas duas cores $\(c_{1} = (R_{1}, G_{1}, B_{1})$, $c_{2} \
+            = (R_{2}, G_{2}, B_{2})\)$, o cálculo da distância euclidiana é dado por: <br><br>" +
+            "$$d(c_{1}, c_{2}) = \sqrt{(R_{1}−R_{2})^2 + (G_{1}− G_{2})^2+(B_{1} − B_{2})^2}$$<br><br>" +
+            "Nossa imagem original (mostrada ao lado) é representada como uma matriz de dimensões \((533, 800, 3)\) \
+            - isto é, \(800\times533\) pixels - e possui \(102.927\) cores RGB únicas.";
+            return false;}
+        function aleatoria()
+            {var img = document.getElementById("image"); img.src="../images/qtz_aleatoria.jpg"; 
+            var h1 = document.getElementById("titulo"); console.log(h1); 
+             h1.innerHTML="<b>Quantização de cor: Aleatória</b>";
+             var p = document.getElementById("descricao"); console.log(p);
+             p.innerHTML="Neste método, escolhemos aleatoriamente <i>n</i> cores da imagem para formar a nova paleta, \
+             e redefinimos as cores de cada pixel como a cor mais próxima à original na nova paleta. \
+             A imagem transformada pode ser vista ao lado, para <i>n</i> = 20.";
+            return false;}
+        function frequente()
+            {var img = document.getElementById("image"); img.src="../images/qtz_frequente.jpg"; 
+            var h1 = document.getElementById("titulo"); console.log(h1); 
+             h1.innerHTML="<b>Quantização de cor: Frequência</b>";
+             var p = document.getElementById("descricao"); console.log(p);
+             p.innerHTML="Aqui temos um teste de uma forma diferente de quantização: vamos utilizar as <i>n</i> cores mais frequentes da imagem. \
+             Como no exemplo acima, tomando <i>n</i> = 20, temos o resultado abaixo. Vamos que o método aleatório preserva \
+             melhor as cores da imagem nesse caso, e, além disso, o tempo de processamento do primeiro <i>(321ms)</i> é menor \
+             que o segundo <i>(1.58s)</i>.";
+            return false;}
+        function kmeans()
+            {var img = document.getElementById("image"); img.src="../images/qtz_kmeans.jpg"; 
+            var h1 = document.getElementById("titulo"); console.log(h1); 
+             h1.innerHTML="<b>Quantização de cor: K-Means</b>";
+             var p = document.getElementById("descricao"); console.log(p);
+             p.innerHTML="Por fim, testamos aqui a quantização com o método K-Means, como proposto no \
+             <a href=\"https://lmcaraig.com/color-quantization-using-k-means\">artigo</a>. \
+             Esse algoritmo de clusterização começa com <i>n</i> pontos aleatórios no espaço de cor, \
+            e divide o espaço em \(n\) grupos cujos centróides são um dos pontos escolhidos inicialmente e \
+            todos os pontos num mesmo grupo estão mais próximos de seu próprio centróide do que dos centróides dos demais grupos.";
+            return false;} 
+    </script>
+</head>
+
+<body style="background-color:white;">
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-lato w3-theme w3-animate-left" id="mySidebar">
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="../index.html">Início</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="intro.html">Introdução: Representação da imagem</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="quantize.html">Quantização de cores</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="conclusion.html">Conclusões</a>
+
+        <div style="position: absolute; bottom: 5px; font-size: 80%; margin-left: 10px" class='w3-lato-light'>
+            <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+        </div>
+    </nav>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay">
+    </div>
+
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main w3-lato" style="margin-left:250px">
+
+        <div class="w3-third w3-lato">
+            <h1 id="titulo" class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Quantização de cor</b></h1>
+            <p id="descricao">
+
+            <!-- Neste método, escolhemos aleatoriamente <i>n</i> cores da imagem para formar a nova paleta, e redefinimos as cores de cada pixel como a cor mais próxima à original na nova paleta.
+            A imagem transformada pode ser vista ao lado, para \(n=20\). -->
+            O processo de discretização do espaço de cores (podendo esse ser originalmente finito ou infinito) é chamado de <b>quantização</b>, e pode ser feito de diversas maneiras. 
+            Neste trabalho iremos mostrar alguns dos métodos de quantização (e testar outros) - isto é, diferentes formas de selecionar um subconjunto do espaço de cores da imagem.<br><br>
+            
+            Para reduzirmos o número de cores, precisamos fazer algumas escolhas, como quais cores serão substituídas por outras. Para isso, 
+            iremos comparar duas ou mais cores utilizando a distância euclidiana - dadas duas cores \(c_{1} = (R_{1}, G_{1}, B_{1}), c_{2} = (R_{2}, G_{2}, B_{2})\), o cálculo da distância euclidiana é dado por:
+
+            $$d(c_{1}, c_{2}) = \sqrt{(R_{1}−R_{2})^2 + (G_{1}− G_{2})^2+(B_{1} − B_{2})^2}$$
+
+            Nossa imagem original (mostrada ao lado) é representada como uma matriz de dimensões \((533, 800, 3)\) - isto é, \(800\times533\) pixels - e possui \(102.927\) cores RGB únicas.
+        </div>
+
+        <div class="w3-rest">
+            <figure>
+                <center><img id="image" src="../images/washington.jpg" alt="original">
+                    <figcaption><i>Fonte: Flickr - Washington por Crash Test Mike</i></figcaption></center>
+            </figure>
+            <div class="w3-container w3-theme-teal" style='margin-left: 40px; background-color: teal;'>
+                <h4 class="w3-lato" style="color: #ffffff; align-content: center;">
+                    Clique nos botões para transformar a imagem:</h4>
+                <button id="clickme" onclick="original();">Original</button>
+                <button id="clickme" onclick="aleatoria();">Aleatória</button>
+                <button id="clickme" onclick="frequente();">Tons + frequentes</button>
+                <button id="clickme" onclick="kmeans();">K-Means</button>
+                <br><br>
+            </div>
+        </div>
+    </div>
+
+    <!-- END MAIN -->
+    </div>
+
+    <script>
+    // Get the Sidebar
+    var mySidebar = document.getElementById("mySidebar");
+    // Get the DIV with overlay effect
+    var overlayBg = document.getElementById("myOverlay");
+    // Toggle between showing and hiding the sidebar, and add overlay effect
+    function w3_open() {
+    if (mySidebar.style.display === 'block') {
+        mySidebar.style.display = 'none';
+        overlayBg.style.display = "none";
+    } else {
+        mySidebar.style.display = 'block';
+        overlayBg.style.display = "block";
+    }
+    }
+    // Close the sidebar with the close button
+    function w3_close() {
+    mySidebar.style.display = "none";
+    overlayBg.style.display = "none";
+    }
+    </script>
+
+</body>
+
+<!--
+        <h4>Quantização aleatória</h4>
+
+        <p>
+        Neste método, escolhemos aleatoriamente <i>n</i> cores da imagem para formar a nova paleta, e redefinimos as cores de cada pixel como a cor mais próxima à original na nova paleta.
+        A imagem transformada pode ser vista abaixo, para \(n=20\):
+
+        <figure>
+                <center><img src="images/qtz_aleatoria.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com amostra aleatória</i></figcaption></center>
+                </figure>
+        </p>
+
+
+        <h4>Quantização pelas cores mais frequentes - Algoritmo de populosiodade</h4>
+
+        <p>
+        Aqui temos um teste de uma forma diferente de quantização: vamos utilizar as \(n\) cores mais frequentes da imagem. 
+        Como no exemplo acima, tomando \(n=20\), temos o resultado abaixo. 
+        Vamos que o método aleatório preserva melhor as cores da imagem nesse caso, e, além disso, o tempo de processamento do primeiro \((321ms)\) é menor que o segundo \((1.58s)\).
+
+        <figure>
+                <center><img src="images/qtz_frequente.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com cores mais frequentes</i></figcaption></center>
+                </figure>
+        </p>
+
+        <h4>Quantização com limiar constante</h4>
+
+        <p>
+        Um método comum (no caso de figuras preto e branco) é definirmos um limIar constante, \(L_{0})\), 
+        no qual as cores serão atribuídas como 1 caso a intensidade seja maior que \(L_{0}\), e 0 caso contrário.
+
+        No caso do RGB, podemos selecionar, por exemplo, cores que tenham maior intensidade em cada um dos canais. 
+        O teste foi feito para os limites \((200,0,0)\) (vermelho), \((0,200,0)\) (verde) e \((0,0,200)\) (azul), resultando nas seguintes figuras:
+
+        <figure>
+                <center><img src="images/qtz_vermelho.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com maior intensidade de verde (n = 155)</i></figcaption></center>
+                </figure>
+
+        <figure>
+                <center><img src="images/qtz_verde.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com maior intensidade de verde (n = 760)</i></figcaption></center>
+                </figure>
+            
+        <figure>
+                <center><img src="images/qtz_azul.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com maior intensidade de azul (n = 2458)</i></figcaption></center>
+                </figure>
+
+        Os tempos de processamento foram, respectivamente, \(10.1s\), \(4.27s\) e \(20s\), diretamente relacionado à quantidade de cores que é mantida em cada um dos casos.
+        </p>
+
+        <h4>Quantização com K-Means</h4>
+
+        <p>
+        Por fim, testamos aqui a quantização com o método K-Means, como proposto no <a href="https://lmcaraig.com/color-quantization-using-k-means">artigo</a>.
+        Esse algoritmo de clusterização comeá com \(n\) pontos aleatórios no espaço de cor, 
+        e divide o espaço em \(n\) grupos cujos centróides são um dos pontos escolhidos inicialmente e 
+        todos os pontos num mesmo grupo estão mais próximos de seu próprio centróide do que dos centróides dos demais grupos.
+
+        <figure>
+                <center><img src="images/qtz_kmeans.jpg" alt="aleatoria">
+                    <figcaption><i>Imagem quantizada com K-Means (n=20)</i></figcaption></center>
+                </figure>
+        </p>
+
+</body> -->
