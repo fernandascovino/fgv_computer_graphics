@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="por">
+<title>Quantização de cores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<style>.w3-lato {font-family: 'Lato', sans-serif;}</style>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+<script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
+<meta charset="utf-8"></meta>
+
+<body style="background-color:white;">
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-lato w3-theme w3-animate-left" id="mySidebar">
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="../index.html">Início</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="intro.html">Introdução: Representação da imagem</a>
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="quantize.html">Quantização de cores</a>
+		<a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="viz.html">Visualização</a>
+        <a class="w3-bar-item w3-button w3-lato w3-hover-light-teal" href="conclusion.html">Conclusões</a>
+
+        <div style="position: absolute; bottom: 5px; font-size: 80%; margin-left: 10px" class='w3-lato-light'>
+            <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+        </div>
+    </nav>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay">
+    </div>
+
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main w3-lato" style="margin-left:250px;">
+
+        <div class="w3-row"></div>
+            <div class="w3-half w3-lato">
+                <h1 class="w3-text-teal w3-lato" style = "margin-top: 50px"><b>Visualizando a quantização</b></h1>
+            <p>
+			Ao lado pode ser vista com mais detalhe a transformação das cores aplicando os algoritmos numa representação de
+			imagem SVG. Nas transformações são escolhidas sempre 3 cores pelos algoritmos e as cores da imagem são repameadas de acordo.<br><br>
+
+			A quantização também é utilizada como parte do processo de conversão de imagens rasterizadas para vetorizadas, 
+			comprimindo o número de cores da imagem e agregando pixels de cores semelhantes em retas ou curvas.
+			</p>
+			
+			<!-- <input type="button" id='script' name="scriptbutton" value=" Run Script " onclick="goPython()">
+			<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+			<script>
+				function goPython(){
+					$.ajax({
+					url: "MYSCRIPT.py",
+					context: document.body
+					}).done(function() {
+					alert('finished python script');;
+					});
+				}
+			</script> -->
+		</div>
+
+		<script>
+			function original() {
+				document.getElementById('c1').setAttribute('r', 0);
+				document.getElementById('c2').setAttribute('r', 0);
+				document.getElementById('c3').setAttribute('r', 0);
+
+				document.getElementById('r11').style.fill = "#77C3F2";
+				document.getElementById('r12').style.fill = "#A3D8FA";
+				document.getElementById('r13').style.fill = "#92CFFB";
+				document.getElementById('r14').style.fill = "#77C3F2";
+				
+				document.getElementById('r21').style.fill = "#C6D8E7";
+				document.getElementById('r22').style.fill = "#D8E6E7";
+				document.getElementById('r23').style.fill = "#A8CBE6";
+				document.getElementById('r24').style.fill = "#C6D8E7";
+				
+				document.getElementById('r31').style.fill = "#E8DFE0";
+				document.getElementById('r32').style.fill = "#E6D6BF";
+				document.getElementById('r33').style.fill = "#FBD73A";
+				document.getElementById('r34').style.fill = "#D1B16A";
+				
+				document.getElementById('r41').style.fill = "#BCA647";
+				document.getElementById('r42').style.fill = "#D49935";
+				document.getElementById('r43').style.fill = "#FBD73A";
+				document.getElementById('r44').style.fill = "#996E26";
+				
+			}
+			function aleatoria() { 
+				document.getElementById('c1').setAttribute('r', 10);
+				document.getElementById('c1').setAttribute('cx', 275);
+				document.getElementById('c1').setAttribute('cy', 125);
+
+				document.getElementById('c2').setAttribute('r', 10);
+				document.getElementById('c2').setAttribute('cx', 425);
+				document.getElementById('c2').setAttribute('cy', 275);
+
+				document.getElementById('c3').setAttribute('r', 10);
+				document.getElementById('c3').setAttribute('cx', 125);
+				document.getElementById('c3').setAttribute('cy', 425);
+				
+				document.getElementById('r11').style.fill = '#a3d8fa';
+				document.getElementById('r12').style.fill = '#a3d8fa';
+				document.getElementById('r13').style.fill = '#a3d8fa';
+				document.getElementById('r14').style.fill = '#a3d8fa';
+
+				document.getElementById('r21').style.fill = '#a8cbe6';
+				document.getElementById('r22').style.fill = '#e8dfe0';
+				document.getElementById('r23').style.fill = '#a8cbe6';
+				document.getElementById('r24').style.fill = '#a8cbe6';
+					
+				document.getElementById('r31').style.fill = '#e8dfe0';
+				document.getElementById('r32').style.fill = '#e8dfe0';
+				document.getElementById('r33').style.fill = '#e8dfe0';
+				document.getElementById('r34').style.fill = '#e8dfe0';
+
+				document.getElementById('r41').style.fill = '#a8cbe6';
+				document.getElementById('r42').style.fill = '#e8dfe0';
+				document.getElementById('r43').style.fill = '#e8dfe0';
+				document.getElementById('r44').style.fill = '#a8cbe6';
+			}
+
+			function frequencia() { 
+				document.getElementById('c1').setAttribute('r', 10);
+				document.getElementById('c1').setAttribute('cx', 125);
+				document.getElementById('c1').setAttribute('cy', 125);
+
+				document.getElementById('c2').setAttribute('r', 10);
+				document.getElementById('c2').setAttribute('cx', 125);
+				document.getElementById('c2').setAttribute('cy', 275);
+
+				document.getElementById('c3').setAttribute('r', 10);
+				document.getElementById('c3').setAttribute('cx', 425);
+				document.getElementById('c3').setAttribute('cy', 425);
+
+				
+				document.getElementById('r11').style.fill = '#77c3f2';
+				document.getElementById('r12').style.fill = '#c6d8e7';
+				document.getElementById('r13').style.fill = '#77c3f2';
+				document.getElementById('r14').style.fill = '#77c3f2';
+
+				document.getElementById('r21').style.fill = '#c6d8e7';
+				document.getElementById('r22').style.fill = '#c6d8e7';
+				document.getElementById('r23').style.fill = '#c6d8e7';
+				document.getElementById('r24').style.fill = '#c6d8e7';
+					
+				document.getElementById('r31').style.fill = '#c6d8e7';
+				document.getElementById('r32').style.fill = '#c6d8e7';
+				document.getElementById('r33').style.fill = '#fbd73a';
+				document.getElementById('r34').style.fill = '#fbd73a';
+
+				document.getElementById('r41').style.fill = '#fbd73a';
+				document.getElementById('r42').style.fill = '#fbd73a';
+				document.getElementById('r43').style.fill = '#fbd73a';
+				document.getElementById('r44').style.fill = '#fbd73a';
+			}
+
+			function kmeans() { 
+				document.getElementById('c1').setAttribute('r', 0);
+				document.getElementById('c2').setAttribute('r', 0);
+				document.getElementById('c3').setAttribute('r', 0);
+				
+				document.getElementById('r11').style.fill = '#8fcbf3';
+				document.getElementById('r12').style.fill = '#8fcbf3';
+				document.getElementById('r13').style.fill = '#8fcbf3';
+				document.getElementById('r14').style.fill = '#8fcbf3';
+
+				document.getElementById('r21').style.fill = '#d6dbdd';
+				document.getElementById('r22').style.fill = '#d6dbdd';
+				document.getElementById('r23').style.fill = '#8fcbf3';
+				document.getElementById('r24').style.fill = '#d6dbdd';
+					
+				document.getElementById('r31').style.fill = '#d6dbdd';
+				document.getElementById('r32').style.fill = '#d6dbdd';
+				document.getElementById('r33').style.fill = '#d2ac40';
+				document.getElementById('r34').style.fill = '#d2ac40';
+
+				document.getElementById('r41').style.fill = '#d2ac40';
+				document.getElementById('r42').style.fill = '#d2ac40';
+				document.getElementById('r43').style.fill = '#d2ac40';
+				document.getElementById('r44').style.fill = '#d2ac40';
+			}
+		</script>
+
+		<div class="w3-rest">
+			   
+				<svg version="1.1" id="Base" height="500" wx="0px" y="0px"
+				viewBox="0 0 700 700" style="enable-background:new 0 0 700 700;" xml:space="preserve">
+		   <g>
+			 <rect id="r11" x="50" y="50" width="150" height="150"
+			 style="fill:#77C3F2;stroke:white;stroke-width:5" />
+			 <rect id="r12" x="200" y="50" width="150" height="150"
+			 style="fill:#A3D8FA;stroke:white;stroke-width:5" />
+			 <rect id="r13" x="350" y="50" width="150" height="150"
+			 style="fill:#92CFFB;stroke:white;stroke-width:5" />
+			 <rect id="r14" x="500" y="50" width="150" height="150"
+			 style="fill:#77C3F2;stroke:white;stroke-width:5" /> 
+			 
+			 <rect id="r21" x="50" y="200" width="150" height="150"
+			 style="fill:#C6D8E7;stroke:white;stroke-width:5" />
+			 <rect id="r22" x="200" y="200" width="150" height="150"
+			 style="fill:#D8E6E7;stroke:white;stroke-width:5" />
+			 <rect id="r23" x="350" y="200" width="150" height="150"
+			 style="fill:#A8CBE6;stroke:white;stroke-width:5" />
+			 <rect id="r24" x="500" y="200" width="150" height="150"
+			 style="fill:#C6D8E7;stroke:white;stroke-width:5" />
+			 
+			 <rect id="r31" x="50" y="350" width="150" height="150"
+			 style="fill:#E8DFE0;stroke:white;stroke-width:5" />
+			 <rect id="r32" x="200" y="350" width="150" height="150"
+			 style="fill:#E6D6BF;stroke:white;stroke-width:5" /> 
+			 <rect id="r33" x="350" y="350" width="150" height="150"
+			 style="fill:#FBD73A;stroke:white;stroke-width:5" />
+			 <rect id="r34" x="500" y="350" width="150" height="150"
+			 style="fill:#D1B16A;stroke:white;stroke-width:5" />
+			 
+			 <rect id="r41" x="50" y="500" width="150" height="150"
+			 style="fill:#BCA647;stroke:white;stroke-width:5" />
+			 <rect id="r42" x="200" y="500" width="150" height="150"
+			 style="fill:#D49935;stroke:white;stroke-width:5" />
+			 <rect id="r43" x="350" y="500" width="150" height="150"
+			 style="fill:#FBD73A;stroke:white;stroke-width:5" />
+			 <rect id="r44" x="500" y="500" width="150" height="150"
+			 style="fill:#996E26;stroke:white;stroke-width:5" /> 
+			 
+			 <!--   Escolhendo cores aleatorias -->
+			 
+			 <circle id="c1" cx="275" cy="125" r="0" fill="red" />
+			 <circle id="c2" cx="425" cy="275" r="0" fill="red" />
+			 <circle id="c3" cx="125" cy="425" r="0" fill="red" />
+			 
+			 </svg>
+			   
+			<div class="w3-container w3-theme-teal" style='margin-left: 40px; background-color: teal;'>
+				<h4 class="w3-lato" style="color: #ffffff; align-content: center;">
+				Clique nos botões para transformar a imagem:</h4>
+				
+				<button class="play" onClick="original();">Original</button>
+				<button class="play" onClick="aleatoria();">Aleatorio</button>
+				<button class="play" onClick="frequencia();">Cores + frequentes</button>
+				<button class="play" onClick="kmeans();">K-Means</button>
+				  <br><br>
+			</div>
+		</div>
+	
+</div>
+
+<!-- END MAIN -->
+</div>
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
+
+</body>
+</html>
