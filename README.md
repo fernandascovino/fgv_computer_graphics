@@ -1,6 +1,6 @@
 ## Computer Graphics @ FGV/EMAp
 
-- [Project A1](/projects): https://fernandascovino.github.io/fgv_computer_graphics/project1.html
+The project developed along the course is available at: https://fernandascovino.github.io/fgv_computer_graphics
 
 ### Authors
 
