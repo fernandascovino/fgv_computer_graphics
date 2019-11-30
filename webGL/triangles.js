@@ -2,6 +2,15 @@
 // Feito por Fernanda Scovino (código adaptado do tutorial)
 // Tutorial: https://www.youtube.com/watch?v=XNbtwyWh9HA
 
+// Define o número de triângulos a serem desenhadosx
+var n_triangulos = prompt("Quantos triângulos vamos desenhar (1 a 10)?", 1);
+var n_triangulos = parseInt(n_triangulos)
+
+if (n_triangulos > 10) {
+    alert("Máximo de 10 triângulos!");
+}
+
+
 var canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
 
@@ -46,28 +55,46 @@ gl.linkProgram(program)
 // Cria triângulo superior
 var vertices = new Float32Array([
     0, 1,   
-    -1/2, 0,
-    1/2, 0
+    -1/4, 1/2,
+    1/4, 1/2
 ])
 
+// Ajusta o número por terem vértices repetidos
+var des_triangulos = n_triangulos
+n_3 = Math.floor(des_triangulos / 3)
+
+if (n_3 > 0){
+    des_triangulos = des_triangulos + (n_3 - 1)*3
+    if (n_triangulos % 3 != 0){
+        des_triangulos += 1
+        if (n_3 > 2){
+            des_triangulos += 4
+        }
+    }
+}
+
 // Cria triângulos inferiores com os vértices do anterior
-for (var i = 0; i < 3; i++){
-    var j = 2 * i
-
-    // Define aresta inferior
-    var bottom_y = vertices[j+1] - 1
+for (var i = 0; i < des_triangulos; i++){
     
-    // Define a coordenada x dos vértices da aresta inferior
-    var bottom_lx = vertices[j] - 1/2
-    var bottom_rx = vertices[j] + 1/2
+    if (i % 3 != 0){
+        j = 2*i
+        // Define aresta inferior
+        var bottom_y = vertices[j+1] - 1/2
+            
+        // Define a coordenada x dos vértices da aresta inferior
+        var bottom_lx = vertices[j] - 1/4
+        var bottom_rx = vertices[j] + 1/4
 
-    // Adiciona o triângulo
-    new_vertices = new Float32Array([
-        vertices[j], vertices[j+1],
-        bottom_lx, bottom_y,
-        bottom_rx, bottom_y
-    ])
-    vertices = Float32Array.from([...vertices, ...new_vertices])
+        // Adiciona o triângulo
+        new_vertices = new Float32Array([
+            vertices[j], vertices[j+1],
+            bottom_lx, bottom_y,
+            bottom_rx, bottom_y
+        ])
+
+        vertices = Float32Array.from([...vertices, ...new_vertices])
+    }
+
 }
 
 // Associa a forma criada com o buffer
